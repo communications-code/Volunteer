@@ -19,6 +19,7 @@ Set the values in `.env` before running against a real database:
 - `CRON_SECRET`: long random secret for Vercel cron endpoints.
 - `HOST_URL`: production Vercel URL, preferably `https://apps.vfwharrisonoh.org`.
 - `PUBLIC_URL`: Wix page URL that embeds the app, likely `https://vfwharrisonoh.org/volunteer/`.
+- `VITE_PUBLIC_URL`: same Wix page URL, used by frontend share links.
 - `DEFAULT_FROM_EMAIL`: sender address, default `communications@vfwharrisonoh.org`.
 - `CONTACT_EMAIL`: inbox for contact/admin messages.
 - `MAILERSEND_API_TOKEN`: transactional email API token.
@@ -55,6 +56,7 @@ vercel env add SESSION_SECRET
 vercel env add CRON_SECRET
 vercel env add HOST_URL
 vercel env add PUBLIC_URL
+vercel env add VITE_PUBLIC_URL
 vercel env add DEFAULT_FROM_EMAIL
 vercel env add CONTACT_EMAIL
 vercel env add MAILERSEND_API_TOKEN
