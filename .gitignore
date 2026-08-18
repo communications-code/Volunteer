@@ -29,3 +29,4 @@ cookie.txt
 api/calendar_sync_shared_secret/
 tmp/
 output/
+.env*
