@@ -1,0 +1,20 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": "npm run vercel-build",
+  "outputDirectory": "dist/public",
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/[...route]" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/event-signup-reminders",
+      "schedule": "0 13 * * *"
+    },
+    {
+      "path": "/api/cron/calendar-sync",
+      "schedule": "15 14 * * *"
+    }
+  ]
+}
