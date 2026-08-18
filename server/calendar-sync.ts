@@ -12,7 +12,7 @@ import {
 } from "@shared/schema";
 
 const CALENDAR_SYNC_SOURCE = "servingnetwork";
-const CALENDAR_SYNC_ORG_ID = "clh";
+const CALENDAR_SYNC_ORG_ID = "vfw";
 const DEFAULT_TIMEZONE = "America/New_York";
 const MAX_ERROR_LENGTH = 1200;
 const TIME_PATTERN = /^([01]\d|2[0-3]):([0-5]\d)$/;

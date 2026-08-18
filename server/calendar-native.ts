@@ -5,7 +5,7 @@ import { queryClient } from "./db";
 
 const { RRule, rrulestr } = rrulePkg;
 
-const DEFAULT_CALENDAR_ORG_ID = "clh";
+const DEFAULT_CALENDAR_ORG_ID = "vfw";
 const DEFAULT_TIMEZONE = "America/New_York";
 
 type WeekdayCode = "SU" | "MO" | "TU" | "WE" | "TH" | "FR" | "SA";
