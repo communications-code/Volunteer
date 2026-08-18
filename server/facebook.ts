@@ -4,7 +4,7 @@ import type { Need } from '@shared/schema';
 const GRAPH_API_VERSION = 'v18.0';
 
 // Public-facing URL (the parent site that iframes the app)
-const PUBLIC_URL = process.env.PUBLIC_URL || 'https://vfwharrisonoh.org/serving-network/';
+const PUBLIC_URL = process.env.PUBLIC_URL || 'https://vfwharrisonoh.org/volunteer/';
 
 /**
  * Post a combined message to the Post Facebook Page listing all new needs.

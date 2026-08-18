@@ -1,5 +1,5 @@
 const CANONICAL_PUBLIC_ORIGIN = "https://vfwharrisonoh.org";
-const FALLBACK_SERVE_URL = "https://vfwharrisonoh.org/serving-network/";
+const FALLBACK_SERVE_URL = "https://vfwharrisonoh.org/volunteer/";
 
 export type SortParam = "priority" | "neededBy" | "neededMonth";
 
@@ -27,7 +27,7 @@ export function getCanonicalServeUrl(configuredUrl?: string): string {
   try {
     const url = new URL(normalized);
     if (url.pathname === "/" || url.pathname === "") {
-      url.pathname = "/serving-network/";
+      url.pathname = "/volunteer/";
     }
     return url.toString();
   } catch {

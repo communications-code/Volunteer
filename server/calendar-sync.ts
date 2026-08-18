@@ -94,7 +94,7 @@ function toSyncErrorMessage(error: unknown): string {
 }
 
 function toSignupUrl(needId: number): string {
-  const publicUrl = process.env.PUBLIC_URL || "https://vfwharrisonoh.org/serving-network/";
+  const publicUrl = process.env.PUBLIC_URL || "https://vfwharrisonoh.org/volunteer/";
   const separator = publicUrl.includes("?") ? "&" : "?";
   return `${publicUrl}${separator}need=${needId}`;
 }

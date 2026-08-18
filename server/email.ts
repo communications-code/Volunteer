@@ -15,7 +15,7 @@ const HOST_URL =
   process.env.HOST_URL ||
   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://apps.vfwharrisonoh.org");
 
-const PUBLIC_URL = process.env.PUBLIC_URL || "https://vfwharrisonoh.org/serving-network/";
+const PUBLIC_URL = process.env.PUBLIC_URL || "https://vfwharrisonoh.org/volunteer/";
 
 const CONTACT_EMAIL = process.env.CONTACT_EMAIL?.trim() || "communications@vfwharrisonoh.org";
 const CONTACT_PHONE = process.env.CONTACT_PHONE?.trim() || "513-367-7570";
