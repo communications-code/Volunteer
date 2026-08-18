@@ -2212,7 +2212,7 @@ var init_email = __esm({
     MAILERSEND_API_BASE = "https://api.mailersend.com/v1/";
     DEFAULT_FROM_EMAIL = process.env.DEFAULT_FROM_EMAIL?.trim() || "communications@vfwharrisonoh.org";
     HOST_URL = process.env.HOST_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://apps.vfwharrisonoh.org");
-    PUBLIC_URL = process.env.PUBLIC_URL || "https://vfwharrisonoh.org/serving-network/";
+    PUBLIC_URL = process.env.PUBLIC_URL || "https://vfwharrisonoh.org/volunteer/";
     CONTACT_EMAIL = process.env.CONTACT_EMAIL?.trim() || "communications@vfwharrisonoh.org";
     CONTACT_PHONE = process.env.CONTACT_PHONE?.trim() || "513-367-7570";
     BRAND_LOGO_URL = process.env.BRAND_LOGO_URL?.trim() || `${HOST_URL}/assets/vfw-logo-full-color.svg`;
@@ -3336,7 +3336,7 @@ import { createHash as createHash2, randomUUID } from "crypto";
 import { fromZonedTime } from "date-fns-tz";
 import { and as and3, asc as asc2, eq as eq4, lte } from "drizzle-orm";
 var CALENDAR_SYNC_SOURCE = "servingnetwork";
-var CALENDAR_SYNC_ORG_ID = "clh";
+var CALENDAR_SYNC_ORG_ID = "vfw";
 var DEFAULT_TIMEZONE = "America/New_York";
 var MAX_ERROR_LENGTH = 1200;
 var TIME_PATTERN = /^([01]\d|2[0-3]):([0-5]\d)$/;
@@ -3360,7 +3360,7 @@ function toSyncErrorMessage(error) {
   return "Unknown sync error";
 }
 function toSignupUrl(needId) {
-  const publicUrl = process.env.PUBLIC_URL || "https://vfwharrisonoh.org/serving-network/";
+  const publicUrl = process.env.PUBLIC_URL || "https://vfwharrisonoh.org/volunteer/";
   const separator = publicUrl.includes("?") ? "&" : "?";
   return `${publicUrl}${separator}need=${needId}`;
 }
@@ -4343,7 +4343,7 @@ init_db();
 import { fromZonedTime as fromZonedTime2, toZonedTime } from "date-fns-tz";
 import rrulePkg from "rrule";
 var { RRule, rrulestr } = rrulePkg;
-var DEFAULT_CALENDAR_ORG_ID = "clh";
+var DEFAULT_CALENDAR_ORG_ID = "vfw";
 var DEFAULT_TIMEZONE2 = "America/New_York";
 var jsDayToWeekdayCode = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
 var rruleDayToCode = {
