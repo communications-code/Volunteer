@@ -10,6 +10,8 @@ const MAILERSEND_API_TOKEN =
 const MAILERSEND_API_BASE = "https://api.mailersend.com/v1/";
 
 const DEFAULT_FROM_EMAIL = process.env.DEFAULT_FROM_EMAIL?.trim() || "communications@vfwharrisonoh.org";
+const MAILERSEND_FROM_EMAIL = process.env.MAILERSEND_FROM_EMAIL?.trim();
+const MAILERSEND_FROM_NAME = process.env.MAILERSEND_FROM_NAME?.trim() || "VFW Post 7570";
 
 const HOST_URL =
   process.env.HOST_URL ||
@@ -242,8 +244,9 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
     return false;
   }
 
+  const fromEmail = MAILERSEND_FROM_EMAIL || params.from;
   const payload: Record<string, unknown> = {
-    from: { email: params.from },
+    from: { email: fromEmail, name: MAILERSEND_FROM_NAME },
     to: recipients,
     subject: params.subject,
     text: params.text || undefined,
@@ -257,6 +260,8 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
 
   if (params.replyTo?.trim()) {
     payload.reply_to = { email: params.replyTo.trim() };
+  } else if (fromEmail !== params.from && params.from.trim()) {
+    payload.reply_to = { email: params.from.trim() };
   }
 
   if (typeof params.sendAtUnix === "number" && Number.isFinite(params.sendAtUnix)) {

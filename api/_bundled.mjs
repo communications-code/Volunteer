@@ -1620,8 +1620,9 @@ async function sendEmail(params) {
     console.error("MailerSend email error: at least one recipient is required");
     return false;
   }
+  const fromEmail = MAILERSEND_FROM_EMAIL || params.from;
   const payload = {
-    from: { email: params.from },
+    from: { email: fromEmail, name: MAILERSEND_FROM_NAME },
     to: recipients,
     subject: params.subject,
     text: params.text || void 0,
@@ -1634,6 +1635,8 @@ async function sendEmail(params) {
   };
   if (params.replyTo?.trim()) {
     payload.reply_to = { email: params.replyTo.trim() };
+  } else if (fromEmail !== params.from && params.from.trim()) {
+    payload.reply_to = { email: params.from.trim() };
   }
   if (typeof params.sendAtUnix === "number" && Number.isFinite(params.sendAtUnix)) {
     payload.send_at = Math.floor(params.sendAtUnix);
@@ -2201,7 +2204,7 @@ VFW Post 7570
     sendAtUnix: options?.sendAtUnix
   });
 }
-var MAILERSEND_API_TOKEN, MAILERSEND_API_BASE, DEFAULT_FROM_EMAIL, HOST_URL, PUBLIC_URL, CONTACT_EMAIL, CONTACT_PHONE, BRAND_LOGO_URL;
+var MAILERSEND_API_TOKEN, MAILERSEND_API_BASE, DEFAULT_FROM_EMAIL, MAILERSEND_FROM_EMAIL, MAILERSEND_FROM_NAME, HOST_URL, PUBLIC_URL, CONTACT_EMAIL, CONTACT_PHONE, BRAND_LOGO_URL;
 var init_email = __esm({
   "server/email.ts"() {
     "use strict";
@@ -2211,6 +2214,8 @@ var init_email = __esm({
     MAILERSEND_API_TOKEN = process.env.MAILERSEND_API_TOKEN?.trim() || process.env.MAILERSEND_API_KEY?.trim();
     MAILERSEND_API_BASE = "https://api.mailersend.com/v1/";
     DEFAULT_FROM_EMAIL = process.env.DEFAULT_FROM_EMAIL?.trim() || "communications@vfwharrisonoh.org";
+    MAILERSEND_FROM_EMAIL = process.env.MAILERSEND_FROM_EMAIL?.trim();
+    MAILERSEND_FROM_NAME = process.env.MAILERSEND_FROM_NAME?.trim() || "VFW Post 7570";
     HOST_URL = process.env.HOST_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://apps.vfwharrisonoh.org");
     PUBLIC_URL = process.env.PUBLIC_URL || "https://vfwharrisonoh.org/volunteer/";
     CONTACT_EMAIL = process.env.CONTACT_EMAIL?.trim() || "communications@vfwharrisonoh.org";
@@ -2894,7 +2899,6 @@ import { fromZodError } from "zod-validation-error";
 import { z as z3 } from "zod";
 import * as fs from "fs";
 import * as path from "path";
-import { randomUUID as randomUUID3 } from "crypto";
 import { createHmac as createHmac3 } from "crypto";
 
 // server/mailerlite.ts
@@ -5574,6 +5578,7 @@ async function moveNativeCalendarOccurrence(params) {
 
 // server/routes.ts
 init_timezone();
+var COMMANDER_NOTIFICATION_EMAIL = "commander@vfwharrisonoh.org";
 function verifySecureToken(token) {
   try {
     if (!process.env.SESSION_SECRET) {
@@ -5808,7 +5813,7 @@ async function registerRoutes(app) {
       )
     );
     const preferenceByUserId = new Map(preferences.map((pref) => [pref.userId, pref]));
-    return admins.filter((admin) => {
+    const eligibleAdminEmails = admins.filter((admin) => {
       const preference = preferenceByUserId.get(admin.id);
       if (!preference || preference.receiveAllNotifications) {
         return true;
@@ -5819,6 +5824,7 @@ async function registerRoutes(app) {
       }
       return needCategories.some((category) => enabledCategories.includes(category));
     }).map((admin) => admin.username).filter((email) => Boolean(email));
+    return Array.from(/* @__PURE__ */ new Set([...eligibleAdminEmails, COMMANDER_NOTIFICATION_EMAIL]));
   };
   const sendEventSignupChangeNotifications = async (need, pledge, changeType) => {
     const signerEmail = pledge.email.trim().toLowerCase();
@@ -7786,23 +7792,17 @@ Please sign in and update it after logging in.`,
       }
       const fileType = matches[1];
       const base64Data = matches[2];
-      const buffer = Buffer.from(base64Data, "base64");
       const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
       if (!allowedTypes.includes(fileType)) {
         return res.status(400).json({
           message: "Invalid file type. Allowed types: JPEG, PNG, GIF, WebP"
         });
       }
-      const uploadsDir2 = path.join(process.cwd(), "public", "uploads");
-      if (!fs.existsSync(uploadsDir2)) {
-        fs.mkdirSync(uploadsDir2, { recursive: true });
+      const byteLength = Buffer.byteLength(base64Data, "base64");
+      if (byteLength > 5 * 1024 * 1024) {
+        return res.status(400).json({ message: "Image must be smaller than 5MB" });
       }
-      const extension = fileType.split("/")[1];
-      const filename = `${randomUUID3()}.${extension}`;
-      const filepath = path.join(uploadsDir2, filename);
-      fs.writeFileSync(filepath, buffer);
-      const fileUrl = `/uploads/${filename}`;
-      res.status(201).json({ url: fileUrl });
+      res.status(201).json({ url: imageData });
     } catch (error) {
       console.error("Error uploading image:", error);
       res.status(500).json({ message: "Failed to upload image" });
@@ -8031,8 +8031,8 @@ function summarizeResponseForLog(body) {
 }
 async function createApp(options) {
   const app = express2();
-  app.use(express2.json());
-  app.use(express2.urlencoded({ extended: false }));
+  app.use(express2.json({ limit: "7mb" }));
+  app.use(express2.urlencoded({ extended: false, limit: "7mb" }));
   app.use((req, res, next) => {
     const start = Date.now();
     const path2 = req.path;

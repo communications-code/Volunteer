@@ -24,7 +24,6 @@ import {
 import { z } from "zod";
 import * as fs from 'fs';
 import * as path from 'path';
-import { randomUUID } from 'crypto';
 import { createHmac } from 'crypto';
 import {
   sendPledgeNotification,
@@ -66,6 +65,8 @@ import {
   getNativePublicCalendarEventsResponse,
 } from "./calendar-native";
 import { getCurrentDateInNewYork } from "./timezone";
+
+const COMMANDER_NOTIFICATION_EMAIL = "commander@vfwharrisonoh.org";
 
 // Helper function to generate secure tokens for email actions
 function generateSecureToken(needId: number, action: string): string {
@@ -429,7 +430,7 @@ export async function registerRoutes(app: Express): Promise<void> {
 
     const preferenceByUserId = new Map(preferences.map((pref) => [pref.userId, pref]));
 
-    return admins
+    const eligibleAdminEmails = admins
       .filter((admin) => {
         const preference = preferenceByUserId.get(admin.id);
         if (!preference || preference.receiveAllNotifications) {
@@ -446,6 +447,8 @@ export async function registerRoutes(app: Express): Promise<void> {
       })
       .map((admin) => admin.username)
       .filter((email): email is string => Boolean(email));
+
+    return Array.from(new Set([...eligibleAdminEmails, COMMANDER_NOTIFICATION_EMAIL]));
   };
 
   const sendEventSignupChangeNotifications = async (
@@ -2941,7 +2944,6 @@ export async function registerRoutes(app: Express): Promise<void> {
       
       const fileType = matches[1];
       const base64Data = matches[2];
-      const buffer = Buffer.from(base64Data, 'base64');
       
       // Check file type
       const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
@@ -2950,24 +2952,15 @@ export async function registerRoutes(app: Express): Promise<void> {
           message: "Invalid file type. Allowed types: JPEG, PNG, GIF, WebP" 
         });
       }
-      
-      // Create uploads directory if it doesn't exist
-      const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-      if (!fs.existsSync(uploadsDir)) {
-        fs.mkdirSync(uploadsDir, { recursive: true });
+
+      const byteLength = Buffer.byteLength(base64Data, "base64");
+      if (byteLength > 5 * 1024 * 1024) {
+        return res.status(400).json({ message: "Image must be smaller than 5MB" });
       }
-      
-      // Generate a unique filename
-      const extension = fileType.split('/')[1];
-      const filename = `${randomUUID()}.${extension}`;
-      const filepath = path.join(uploadsDir, filename);
-      
-      // Write the file
-      fs.writeFileSync(filepath, buffer);
-      
-      // Return the URL to access the file
-      const fileUrl = `/uploads/${filename}`;
-      res.status(201).json({ url: fileUrl });
+
+      // Vercel serverless filesystems are not durable. Store the validated image
+      // payload directly on the need record through its image_url field.
+      res.status(201).json({ url: imageData });
     } catch (error) {
       console.error("Error uploading image:", error);
       res.status(500).json({ message: "Failed to upload image" });
